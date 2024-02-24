@@ -1,14 +1,19 @@
-import { createSlice, createAsyncThunk, Slice, SliceSelectors, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { fetchData } from '../ReduxThunk/thnukActionFunction';
-import { MoviesState } from '../Types';
+import { MoviesState, dataType } from '../Types';
 
-let initialState: MoviesState = { loading: false, error: null, data: null };
+let initialState: MoviesState = { loading: false, error: null, data: {
+	Response:"",
+	Search:[{Poster:"",Title:"",Type:"",Year:"",imdbID:""}],
+	TotalResults:""
+} };
+
 
 
 const dataSlice = createSlice({
 	name: 'data',
 	initialState: initialState,
-	reducers: { setSelectedMoview: (state:MoviesState,action:PayloadAction<any>) => {} },
+	reducers: { setSelectedMoview: (state:MoviesState,action:PayloadAction<dataType, string,never,never>) => {} },
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchData.pending, (state) => {

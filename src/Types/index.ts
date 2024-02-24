@@ -8,11 +8,15 @@ export interface Movie {
 	Type: string;
 	Poster: string;
 }
-
+export type dataType ={
+	Response:string;
+	Search:Movie[];
+	TotalResults:string
+}
 export interface MoviesState {
 	loading: boolean;
 	error: null | string | undefined; // Assume error can be a string or null
-	data: any | null;
+	data: dataType;
 }
 
 export interface RootState {
@@ -24,3 +28,4 @@ export type AppStore = ReturnType<typeof configureStore>;
 export interface ApiResponse {
 	Search: Movie[];
 }
+
