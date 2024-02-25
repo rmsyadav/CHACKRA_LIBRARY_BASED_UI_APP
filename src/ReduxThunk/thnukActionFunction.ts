@@ -8,7 +8,7 @@ export const fetchData = createAsyncThunk<
 	{ dispatch: Dispatch; state: RootState }
 >('data/fetchData', async () => {
 	try {
-		const response = await fetch('https://www.omdbapi.com/?apikey=aaf66081&s=spyder'); // Replace with your API endpoint
+		const response = await fetch('https://www.omdbapi.com/?apikey=aaf66081&s=dilwale'); // Replace with your API endpoint
 		const data:dataType = await response.json();
 		return data;
 	} catch (error: any) {

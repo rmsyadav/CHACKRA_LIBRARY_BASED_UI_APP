@@ -1,4 +1,4 @@
-import { Box, Center, Flex } from '@chakra-ui/layout';
+import { Box} from '@chakra-ui/layout';
 import { Spinner } from '@chakra-ui/spinner';
 import "../EntryComponent/App.css";
 

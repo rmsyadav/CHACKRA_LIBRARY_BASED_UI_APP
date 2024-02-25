@@ -8,44 +8,46 @@ import {
 	AccordionIcon,
 } from '@chakra-ui/react';
 import { Table, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer } from '@chakra-ui/react';
-import { argType } from '../UserFormComponents/UserForm';
-import React, { useContext, useState } from 'react';
-import { usersContext, usersContextType } from '../../ContextStore/ContextStore';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RootState, initialUserState } from '../../Types';
+import { deleteExistingUser } from '../../Reducers/usersReducer';
+import { useDispatch, useSelector } from 'react-redux';
 export type userListPropsType = {
-	userList?: argType[];
+	userList?: initialUserState[];
 	children?: React.ReactNode;
 };
 type useNevigateType = ReturnType<typeof useNavigate>;
 
 const Userlist = (props: userListPropsType): React.ReactElement => {
 	const navigate:useNevigateType = useNavigate();
-	const usersDataContext: usersContextType | null = useContext(usersContext);
-	const deleteUser = (userId: String | undefined) => {
-		usersDataContext?.handleDelUser(userId || '');
+	const dispatch = useDispatch();
+	const usersdata = useSelector<RootState,initialUserState[]>((state)=>state.usersReducer);
+	const deleteUser = (userId: string) => {
+		dispatch(deleteExistingUser(userId));
 	};
-	const [tempUsersData, setTempUsersdata] = useState<String[]>([]);
+	const [tempUsersData, setTempUsersdata] = useState<string[]>([]);
 	const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.checked) {
-			setTempUsersdata((prev: String[]) => {
+			setTempUsersdata((prev: string[]) => {
 				return [...prev, e.target.value];
 			});
 		} else {
-			setTempUsersdata((prev: String[]) => {
+			setTempUsersdata((prev: string[]) => {
 				prev.splice(prev.indexOf(e.target.value), 1);
 				return [...prev];
 			});
 		}
 	};
-	const checkUserChecked = (userId?: String) => {
+	const checkUserChecked = (userId: string) => {
 		return tempUsersData.indexOf(userId || 'user') !== -1 ? false : true;
 	};
 
-	const handleCheckBoxChecked = (userId?: String) => {
-		return tempUsersData.indexOf(userId || 'user') !== -1 ? true : false;
+	const handleCheckBoxChecked = (userId: string) => {
+		return tempUsersData.indexOf(userId) !== -1 ? true : false;
 	};
-    const handleUpdateRoute = (userid?: String)=>{
-		navigate("/updateuser",{state:{userData:usersDataContext?.usersList.find((user,index,users)=>user.id === userid),pageName:'userlist'}});
+    const handleUpdateRoute = (userid: string)=>{
+		navigate("/updateuser",{state:{userData:usersdata.find((user,index,users)=>user.userid === userid),pageName:'userlist'}});
 	}
 	return (
 		<>
@@ -84,14 +86,14 @@ const Userlist = (props: userListPropsType): React.ReactElement => {
 										</Tr>
 									</Thead>
 									<Tbody>
-										{usersDataContext?.usersList?.map(
-											(userData: argType, index: number) => {
+										{usersdata.length >0 && usersdata.map(
+											(userData: initialUserState, index: number) => {
 												return (
 													<Tr key={index}>
 														<td>
 															<Checkbox
-																value={userData.id?.toString() || 'not'}
-																isChecked={handleCheckBoxChecked(userData.id)}
+																value={userData.userid}
+																isChecked={handleCheckBoxChecked(userData.userid)}
 																onChange={(e) => {
 																	handleCheckbox(e);
 																}}
@@ -102,18 +104,13 @@ const Userlist = (props: userListPropsType): React.ReactElement => {
 														<Td>{userData?.usermobileno}</Td>
 														<td>
 														<button
-																disabled={checkUserChecked(userData.id)}
+																disabled={checkUserChecked(userData.userid)}
 																onClick={() => {
-																	// setTempUsersdata((prev: String[]) => {
-																	// 	prev.splice(prev.indexOf(userData.id||"user"), 1);
-																	// 	return [...prev];
-																	// });
-																	// deleteUser(userData.id?.toString());
-																	handleUpdateRoute(userData.id);
+																	handleUpdateRoute(userData.userid);
 																}}
 																style={{
 																	opacity: (() => {
-																		return checkUserChecked(userData.id)
+																		return checkUserChecked(userData.userid)
 																			? '0.5'
 																			: '1';
 																	})(),
@@ -124,17 +121,17 @@ const Userlist = (props: userListPropsType): React.ReactElement => {
 														</td>
 														<td>
 															<button
-																disabled={checkUserChecked(userData.id)}
+																disabled={checkUserChecked(userData.userid)}
 																onClick={() => {
-																	setTempUsersdata((prev: String[]) => {
-																		prev.splice(prev.indexOf(userData.id||"user"), 1);
+																	setTempUsersdata((prev: string[]) => {
+																		prev.splice(prev.indexOf(userData.userid), 1);
 																		return [...prev];
 																	});
-																	deleteUser(userData.id?.toString());
+																	deleteUser(userData.userid);
 																}}
 																style={{
 																	opacity: (() => {
-																		return checkUserChecked(userData.id)
+																		return checkUserChecked(userData.userid)
 																			? '0.5'
 																			: '1';
 																	})(),

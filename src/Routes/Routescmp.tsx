@@ -19,10 +19,10 @@ const Routescmp =():React.ReactElement=>{
 				</Box>
 			</Flex>
         <Routes>
-        <Route path="/" element={<Userform />} />
-        <Route path="/userlist" element={<Userlist />}/>
+        <Route path="/" element={<Userform/>} />
+        <Route path="/userlist" element={<Userlist/>}/>
         <Route path="/card" element={<AirbnbCard />} />
-        <Route path="/updateuser" element={<Userform />} />
+        <Route path="/updateuser" element={<Userform/>} />
         <Route path="*" element={<NoMatch></NoMatch>} />
       </Routes>
     </Router>

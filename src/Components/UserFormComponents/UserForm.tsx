@@ -1,47 +1,35 @@
 import { Stack, Input, Box, Select, Center } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, AlertTitle } from '@chakra-ui/react';
-import { usersContext, usersContextType } from '../../ContextStore/ContextStore';
 import { useLocation } from 'react-router-dom';
 import { Formik, FormikProps } from 'formik';
-import * as Yup from 'yup';
+//import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, initialUserState } from '../../Types';
+import { addNewUser,updateExistingUser } from '../../Reducers/usersReducer';
 
-export type argType = {
-	id?: String;
-	useremail: String;
-	username: String;
-	usermobileno: String;
-};
-export type userFormPropsType = {
-	children?: React.ReactNode;
-};
-export type formikInitialValueType = {
-	username: String;
-	useremail: String;
-	usermobileno: String;
-	newuserid: String;
-};
-export type formikRef = FormikProps<formikInitialValueType>;
+export type formikRef = FormikProps<initialUserState>;
 
-const Userform = (props: userFormPropsType): React.ReactElement => {
-	const initialValues: formikInitialValueType = {
+const Userform = (): React.ReactElement => {
+	const initialValues: initialUserState = {
 		useremail: '',
 		usermobileno: '',
 		username: '',
-		newuserid: '',
+		userid: '',
 	};
 	const toast = useToast();
 	const location = useLocation();
-	const usersDataContext: usersContextType | null = useContext(usersContext);
+	const dispatch = useDispatch();
+	const userData = useSelector<RootState,initialUserState[]>((state)=>state.usersReducer);
 	const formRef = useRef<formikRef>(null);
-	const [selectedUser, setSelectedUser] = useState<argType>({
-		id: '',
+	const [selectedUser, setSelectedUser] = useState<initialUserState>({
+		userid: '',
 		useremail: '',
 		username: '',
 		usermobileno: '',
 	});
-	const [newUserId, setNewUserId] = useState('');
+	const [slectedUserId, setSelectedUserId] = useState('');
 	const [flag, setFlag] = useState(false);
 
 	useEffect(() => {
@@ -91,7 +79,8 @@ const Userform = (props: userFormPropsType): React.ReactElement => {
 					? location.state.userData?.usermobileno
 					: '') || '';
 		}
-	}, [location]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [location]); 
 
 	useEffect(() => {
 		if (selectedUser && location.state?.pageName === 'navbar') {
@@ -101,54 +90,57 @@ const Userform = (props: userFormPropsType): React.ReactElement => {
 				formRef.current.values.usermobileno = selectedUser.usermobileno || '';
 			}
 		}
-	}, [newUserId]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [slectedUserId]);
 
 	const getUniqueId = () => {
-		const localStorageData: argType[] = JSON.parse(localStorage.getItem('users') || '[]');
 		const uniqueId =
-			localStorageData.length > 0
-				? parseInt(localStorageData[localStorageData.length - 1]?.id?.slice(4) || '0') + 1
+			userData.length > 0
+				? parseInt(userData[userData.length - 1].userid.slice(4)) + 1
 				: 1;
 		return uniqueId;
 	};
 
-	const validationSchema = Yup.object().shape({
-		username: Yup.string()
-		  .min(2, 'Too Short!')
-		  .max(50, 'Too Long!')
-		  .required('Required'),
-		usermobileno: Yup.string().min(9, 'Mobile is invalid!')
-		.max(11, 'Mobile Number is envalid').required('Required'),
-		email: Yup.string().email('Invalid email').required('Required'),
-	  });
-	const handleSubmit = (values: formikInitialValueType, { setSubmitting }) => {
-		setSubmitting(false);
+	// const validationSchema = Yup.object().shape({
+	// 	username: Yup.string()
+	// 	  .min(2, 'Too Short!')
+	// 	  .max(50, 'Too Long!')
+	// 	  .required('Required'),
+	// 	usermobileno: Yup.string().min(9, 'Mobile is invalid!')
+	// 	.max(11, 'Mobile Number is envalid').required('Required'),
+	// 	email: Yup.string().email('Invalid email').required('Required'),
+	//   });
+	const handleSubmit = (values: initialUserState) => {
 		if (location.state?.pageName !== 'adduser') {
-			usersDataContext?.handleAddUser &&
-				usersDataContext.handleUpdateUser({
-					id:
+			dispatch(updateExistingUser({
+					userid:
 						location.state?.pageName === 'userlist'
-							? location.state?.userData?.id || ''
-							: newUserId,
+							? location.state?.userData?.userid || ''
+							: slectedUserId,
 					useremail: values.useremail,
 					username: values.username,
 					usermobileno: values.usermobileno,
-				});
+				}));
 			toast({
-				title: 'Account created.',
-				description: "We've created your account for you.",
+				title: 'User has neen updated.',
+				description: "We've updated your slected user for you.",
 				status: 'success',
 				duration: 9000,
 				isClosable: true,
 			});
 		} else {
-			usersDataContext?.handleAddUser &&
-				usersDataContext.handleAddUser({
-					id: 'user' + getUniqueId(),
+			console.log(addNewUser({
+				userid: 'user' + getUniqueId(),
+				useremail: values.useremail,
+				username: values.username,
+				usermobileno: values.usermobileno,
+			}))
+			dispatch(addNewUser({
+					userid: 'user' + getUniqueId(),
 					useremail: values.useremail,
 					username: values.username,
 					usermobileno: values.usermobileno,
-				});
+				}));
 			toast({
 				title: 'Account created.',
 				description: "We've created your account for you.",
@@ -160,9 +152,9 @@ const Userform = (props: userFormPropsType): React.ReactElement => {
 	};
 	return (
 		<>
-			<Formik<formikInitialValueType>
+			<Formik<initialUserState>
 				initialValues={initialValues}
-				validationSchema={validationSchema}
+				//validationSchema={validationSchema}
 				onSubmit={handleSubmit}
 				innerRef={formRef}
 			>
@@ -193,15 +185,15 @@ const Userform = (props: userFormPropsType): React.ReactElement => {
 										bg="tomato"
 										borderColor="tomato"
 										color="white"
-										value={formik.values.newuserid.toString()} // ...force the select's value to match the state variable...
+										value={formik.values.userid.toString()} // ...force the select's value to match the state variable...
 										onChange={(e) => {
 											formik.handleChange(e);
-											setNewUserId(e.target.value);
+											setSelectedUserId(e.target.value);
 											setSelectedUser(
-												usersDataContext?.usersList.find(
-													(user) => user.id === e.target.value
+												userData.find(
+													(user) => user.userid === e.target.value
 												) || {
-													id: '',
+													userid: '',
 													useremail: '',
 													username: '',
 													usermobileno: '',
@@ -210,8 +202,8 @@ const Userform = (props: userFormPropsType): React.ReactElement => {
 										}}
 									>
 										<option value="Select your username">Select your username</option>
-										{usersDataContext?.usersList.map((user: argType, index) => (
-											<option key={index} value={(user?.id || '').toString()}>
+										{userData.map((user: initialUserState, index) => (
+											<option key={index} value={(user.userid || '').toString()}>
 												{user.username}
 											</option>
 										))}

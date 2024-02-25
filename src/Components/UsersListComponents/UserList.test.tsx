@@ -1,10 +1,12 @@
-
-import React from 'react';
-import { render, screen, fireEvent,within } from '@testing-library/react';
+/* eslint-disable testing-library/no-container */
+/* eslint-disable testing-library/no-node-access */
+//within
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect'; // For additional matchers
 import Userlist from './UserList';
 import renderer from 'react-test-renderer';
 const fackUserList = [{
+    userid:'5',
     useremail: "rmsyadav567@gmail.com",
     username: "Ramashankar Kumar",
     usermobileno: "8227914199",
@@ -15,7 +17,7 @@ const fackUserList = [{
  logSpy.mockImplementation(()=>null);
  errorSpy.mockImplementation(()=>null);
 
- it('List component snapshot testing ',()=>{
+ it('List component snapshot testing',()=>{
 
     const UserlistCMP = renderer.create(<Userlist></Userlist>).toJSON();
     expect(UserlistCMP).toMatchSnapshot();
@@ -40,6 +42,7 @@ test('render the email and name of each user',()=>{
 })
 test('check the email and name phone filed is there or not',()=>{
     const {container} = render(<Userlist userList={fackUserList}/>);
+    // eslint-disable-next-line testing-library/no-container
     expect(container.querySelectorAll("tbody tr td")).toHaveLength(3)
     
 })

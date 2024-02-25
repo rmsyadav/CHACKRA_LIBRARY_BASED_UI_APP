@@ -31,9 +31,26 @@ export interface ApiResponse {
 	Search: Movie[];
 }
 export type initialUserState ={
-    id: String;
-	useremail: String;
-	username: String;
-	usermobileno: String;
+    userid: string;
+	useremail: string;
+	username: string;
+	usermobileno: string;
+}
+
+export type pageContextType ={
+    currentPage:string,
+    previousPage:string,
+    addCurrentAndPrevPage:(currentPage:string,previousPage:string)=>void;
+}
+
+export type routeType ={
+    pageName:string,
+    userData?:any,
+}
+export type mockUseLocationType = {
+    pathname: string,
+    search: string,
+    hash: string,
+    state: routeType 
 }
 

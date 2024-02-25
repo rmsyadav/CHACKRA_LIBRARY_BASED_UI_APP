@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-unnecessary-act */
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import Userform from './UserForm';
@@ -5,18 +6,10 @@ import renderer from 'react-test-renderer';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { BrowserRouter, MemoryRouter} from 'react-router-dom';
+import { mockUseLocationType } from '../../Types';
 
 jest.mock('./App');
-export type routeType ={
-    pageName:string,
-    userData?:any,
-}
-export type mockUseLocationType = {
-    pathname: string,
-    search: string,
-    hash: string,
-    state: routeType 
-}
+
 const mockUseLocationValue:mockUseLocationType = {
     pathname: "/",
     search: '',
@@ -43,7 +36,7 @@ logSpy.mockImplementation(() => null);
 errorSpy.mockImplementation(() => null);
 
 describe('testing Userform component =>', () => {
-	it('List component snapshot testing ', () => {
+	it('List component snapshot testing', () => {
 		const UserformCMP: React.ReactElement = renderer.create(<Userform></Userform>).toJSON();
 		expect(UserformCMP).toMatchSnapshot();
 	});
@@ -85,7 +78,6 @@ describe('testing Userform component =>', () => {
 	});
 
 	test('should handle the submit button=>', async () => {
-		const saveUserData = jest.fn();
 		render(
 			<MemoryRouter>
 				<Userform></Userform>
